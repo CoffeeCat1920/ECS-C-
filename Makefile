@@ -1,46 +1,49 @@
-# Variables
-CC = g++
-CFLAGS = -Wall -g
-BUILD_DIR = build
-ENGINE_DIR = Engine
-GAME_DIR = Game
-ENGINE_INCLUDE_DIR = $(ENGINE_DIR)/include
-ENGINE_SRC_DIR = $(ENGINE_DIR)/src
-GAME_INCLUDE_DIR = $(GAME_DIR)/include
-GAME_SRC_DIR = $(GAME_DIR)/src
+# Define the compiler
+CXX = g++
 
-# Directories for object files
-ENGINE_OBJ_DIR = $(BUILD_DIR)/Engine
-GAME_OBJ_DIR = $(BUILD_DIR)/Game
+# Define the directories
+SRCDIR = src
+INCDIR = include
+BINDIR = bin
 
-# Source files and object files
-ENGINE_SRC = $(shell find $(ENGINE_SRC_DIR) -name '*.cpp')
-GAME_SRC = $(shell find $(GAME_SRC_DIR) -name '*.cpp')
-ENGINE_OBJ = $(patsubst $(ENGINE_SRC_DIR)/%.cpp,$(ENGINE_OBJ_DIR)/%.o,$(ENGINE_SRC))
-GAME_OBJ = $(patsubst $(GAME_SRC_DIR)/%.cpp,$(GAME_OBJ_DIR)/%.o,$(GAME_SRC))
+# Define the target executable
+TARGET = $(BINDIR)/app
 
-# Create the build directories if they don't exist
-$(BUILD_DIR):
-	mkdir -p $(BUILD_DIR)/Engine $(BUILD_DIR)/Game
+# Define the source files
+SOURCES = $(wildcard $(SRCDIR)/*.cpp)
 
-# Default target
-all: $(BUILD_DIR) $(ENGINE_OBJ_DIR) $(GAME_OBJ_DIR) $(BUILD_DIR)/myprogram
+# Define the object files
+OBJECTS = $(patsubst $(SRCDIR)/%.cpp, $(BINDIR)/%.o, $(SOURCES)) main.cpp
 
-# Build the executable
-$(BUILD_DIR)/myprogram: $(ENGINE_OBJ) $(GAME_OBJ)
-	$(CC) $(CFLAGS) -o $@ $^
+# Define the compiler flags
+CXXFLAGS = -I$(INCDIR)
 
-# Build object files for Engine
-$(ENGINE_OBJ_DIR)/%.o: $(ENGINE_SRC_DIR)/%.cpp
-	$(CC) $(CFLAGS) -I$(ENGINE_INCLUDE_DIR) -c $< -o $@
+# Define the linker flags
+LDFLAGS = -lSDL2 -lSDL2_image
 
-# Build object files for Game
-$(GAME_OBJ_DIR)/%.o: $(GAME_SRC_DIR)/%.cpp
-	$(CC) $(CFLAGS) -I$(GAME_INCLUDE_DIR) -c $< -o $@
+# Default rule to build the target
+all: $(TARGET)
 
-# Clean build artifacts
+# Rule to link the object files into the target executable
+$(TARGET): $(OBJECTS)
+	@echo "Linking: $(OBJECTS)"
+	$(CXX) $(OBJECTS) -o $@ $(LDFLAGS)
+
+# Rule to compile source files into object files
+$(BINDIR)/%.o: $(SRCDIR)/%.cpp
+	@echo "Compiling $<"
+	mkdir -p $(BINDIR)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# Clean up generated files
 clean:
-	rm -rf $(BUILD_DIR)
+	rm -rf $(BINDIR)/*.o $(TARGET)
+
+# Print variables for debugging
+debug:
+	@echo "Sources: $(SOURCES)"
+	@echo "Objects: $(OBJECTS)"
+	@echo "Target: $(TARGET)"
 
 # Phony targets
-.PHONY: all clean
+.PHONY: all clean debug
