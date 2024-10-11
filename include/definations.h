@@ -29,11 +29,12 @@ struct Vector2 {
 using ComponentType = std::uint8_t;
 const ComponentType MAX_COMPONENTS = 32;
 
-// To keep track of Entities and Components
+// A std::bitset the size of MAX_COMPONENTS
 using Signature = std::bitset<MAX_COMPONENTS>;
 
 // Entity aliases
 using Entity = std::uint32_t;
 const Entity MAX_ENTITIES = 5000;
 
+// The App that is initilized and then displayed
 static App *app = new App;

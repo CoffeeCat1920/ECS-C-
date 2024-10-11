@@ -6,6 +6,7 @@
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 #include <unordered_map>
 
 // To manage all the components each entity has
@@ -97,8 +98,20 @@ class ComponentManager {
 
 private:
   
-  // A Map from that points from String names to ComponenetType   
+  // A Map that points from String names to ComponenetType   
   std::unordered_map<const char*, ComponentType> mComponentType{};
+
+  // A Map that points from String names to IComponentArray-es
+  std::unordered_map<const char*, std::shared_ptr<IComponentArray>> mComponentArray;
+
+  // The component type to be assigned to the next component
+  ComponentType mNextComponentType;
+
+  // Helper Function to get pointers from ComponentManager->mComponentArray-es
+  template<typename T>
+  std::shared_ptr<ComponentArray<T>> GetComponentArray() {
+    const char* typeName = typeid(T).name();
+  }
 
 public:
 
