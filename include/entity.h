@@ -15,7 +15,7 @@ private:
   // All the Ids that are available for Entities
   std::queue<Entity> mAvailableEntities{};
 
-  // All the Ids assigned
+  // All the Signatures assigned
   std::array<Signature, MAX_ENTITIES> mSignatures{};
 
   // All the Entities living
@@ -26,7 +26,7 @@ public:
   EntityManager() {
     
     // Push all the available Signatures in the array
-    for ( Entity e; e < MAX_ENTITIES; e++ ) {
+    for ( Entity e = 0; e < MAX_ENTITIES; e++ ) {
       mAvailableEntities.push(e);
     }
     
@@ -53,6 +53,9 @@ public:
     assert(entity < MAX_ENTITIES && "ERROR: Entity out of range");
 
     mSignatures[entity].reset();
+
+    mAvailableEntities.push(entity);
+    --mLivingEntityCount;
 
   }
 

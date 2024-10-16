@@ -16,6 +16,7 @@ class IComponentArray {
 public:
   virtual ~IComponentArray() = default;
   virtual void EntityDestroy( Entity entity ) = 0;
+
 };
 
 // The actual Implementation
@@ -71,6 +72,7 @@ public:
     mEntityToIndexMap[entityOfLastElement] = indexOfRemovedEntity;
     mIndexToEntityMap[indexOfRemovedEntity] = entityOfLastElement;
 
+    // Remove the Other values
     mEntityToIndexMap.erase(entity);
     mIndexToEntityMap.erase(indexOfLastEntity);
 
@@ -87,9 +89,13 @@ public:
   }
 
   void EntityDestroy(Entity entity) override {
+
     if (mEntityToIndexMap.find(entity) != mEntityToIndexMap.end()) {
+
       RemoveData(entity);
+
     }
+
   }
 
 };
@@ -107,12 +113,25 @@ private:
   // The component type to be assigned to the next component
   ComponentType mNextComponentType;
 
-  // Helper Function to get pointers from ComponentManager->mComponentArray-es
+  // Helper function to get statically casted pointer t ComponentArray of type T
   template<typename T>
   std::shared_ptr<ComponentArray<T>> GetComponentArray() {
     const char* typeName = typeid(T).name();
+    assert ( mComponentType.find(typeName) != mComponentType.end() && "Component Not Rigistered before use." );
+
+    // we are converting mComponentArray entry to ComponentArray 
+    return std::static_pointer_cast<ComponentArray<T>>(mComponentArray[typeName]);
   }
 
 public:
+
+template <typename T>
+  void RegisterComponent() {
+    
+    const char* typeName = typeid(T).name();
+
+    assert( mComponentType.find(typeName) == mComponentType.end() && "Registering Already Registered Componenet" );
+
+  }
 
 };
